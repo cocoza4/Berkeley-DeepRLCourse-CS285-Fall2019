@@ -130,7 +130,6 @@ class RL_Trainer(object):
                 print('\nBeginning logging procedure...')
                 self.perform_logging(itr, paths, eval_policy, train_video_paths)
 
-
                 if self.params['save_params']:
                     # save policy
                     print('\nSaving agent\'s actor...')
@@ -140,13 +139,64 @@ class RL_Trainer(object):
     ####################################
 
     def collect_training_trajectories(self, itr, load_initial_expertdata, collect_policy, batch_size):
-        # TODO: GETTHIS from HW1
+        """
+        :param itr:
+        :param load_initial_expertdata:  path to expert data pkl file
+        :param collect_policy:  the current policy using which we collect data
+        :param batch_size:  the number of transitions we collect
+        :return:
+            paths: a list trajectories
+            envsteps_this_batch: the sum over the numbers of environment steps in paths
+            train_video_paths: paths which also contain videos for visualization purposes
+        """
+
+        # TODO decide whether to load training data or use
+        # HINT: depending on if it's the first iteration or not,
+            # decide whether to either
+                # load the data. In this case you can directly return as follows
+                # ``` return loaded_paths, 0, None ```
+
+                # collect data, batch_size is the number of transitions you want to collect.
+
+        # TODO collect data to be used for training
+        # HINT1: use sample_trajectories from utils
+        # HINT2: you want each of these collected rollouts to be of length self.params['ep_len']
+        print("\nCollecting data to be used for training...")
+        # if itr == 0:
+        #     with open(load_initial_expertdata, 'rb') as f:
+        #         paths = pickle.loads(f.read())
+        #     return paths, 0, None 
+            
+        paths, envsteps_this_batch = sample_trajectories(self.env, collect_policy, batch_size, self.params['ep_len'])
+
+        # collect more rollouts with the same policy, to be saved as videos in tensorboard
+        # note: here, we collect MAX_NVIDEO rollouts, each of length MAX_VIDEO_LEN
+        train_video_paths = None
+        if self.log_video:
+            print('\nCollecting train rollouts to be used for saving videos...')
+            ## TODO look in utils and implement sample_n_trajectories
+            train_video_paths = sample_n_trajectories(self.env, collect_policy, MAX_NVIDEO, MAX_VIDEO_LEN, True)
+
+        return paths, envsteps_this_batch, train_video_paths
 
     def train_agent(self):
-        # TODO: GETTHIS from HW1
+        print('\nTraining agent using sampled data from replay buffer...')
+        for train_step in range(self.params['num_agent_train_steps_per_iter']):
+            ob_batch, ac_batch, re_batch, next_ob_batch, terminal_batch = self.agent.sample(self.params['train_batch_size'])
+            self.agent.train(ob_batch, ac_batch, re_batch, next_ob_batch, terminal_batch)
 
     def do_relabel_with_expert(self, expert_policy, paths):
-        # TODO: GETTHIS from HW1 (although you don't actually need it for this homework)
+        print("\nRelabelling collected observations with labels from an expert policy...")
+
+        # TODO relabel collected obsevations (from our policy) with labels from an expert policy
+        # HINT: query the policy (using the get_action function) with paths[i]["observation"]
+        # and replace paths[i]["action"] with these expert labels
+
+        for path in paths:
+            obs = path["observation"]
+            path["action"] = expert_policy.get_action(obs)
+
+        return paths
 
     ####################################
     ####################################
