@@ -49,17 +49,18 @@ class DQNAgent(object):
 
         # TODO store the latest observation into the replay buffer
         # HINT: see replay buffer's function store_frame
-        self.replay_buffer_idx = TODO
+        obs_b, act_b, rew_b, next_obs_b, done_b = self.sample(self.batch_size)
+        self.replay_buffer_idx = self.replay_buffer.store_frame(obs_b)
 
         eps = self.exploration.value(self.t)
         # TODO use epsilon greedy exploration when selecting action
         # HINT: take random action 
             # with probability eps (see np.random.random())
             # OR if your current step number (see self.t) is less that self.learning_starts
-        perform_random_action = TODO
+        perform_random_action = True np.random.random() < eps or self.t < self.learning_starts
 
         if perform_random_action:
-            action = TODO
+            action = np.random.randint(self.num_actions)
         else:
             # TODO query the policy to select action
             # HINT: you cannot use "self.last_obs" directly as input
@@ -70,7 +71,7 @@ class DQNAgent(object):
             # that you pushed into the buffer and compute the corresponding
             # input that should be given to a Q network by appending some
             # previous frames.
-            enc_last_obs = TODO
+            enc_last_obs = self.replay_buffer.encode_recent_observation()
             enc_last_obs = enc_last_obs[None, :]
 
             # TODO query the policy with enc_last_obs to select action
