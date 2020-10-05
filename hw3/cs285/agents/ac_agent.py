@@ -42,7 +42,7 @@ class ACAgent(BaseAgent):
             # 4) calculate advantage (adv_n) as A(s, a) = Q(s, a) - V(s)
         V_s = self.critic.forward(ob_no)
         V_s_ = self.critic.forward(next_ob_no)
-        Q = re_n + self.gamma*V_s_*(1-terminal_n)
+        Q = re_n + self.gamma * V_s_ * (1 - terminal_n)
         adv_n = Q - V_s
 
         if self.standardize_advantages:

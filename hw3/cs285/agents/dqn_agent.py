@@ -49,15 +49,14 @@ class DQNAgent(object):
 
         # TODO store the latest observation into the replay buffer
         # HINT: see replay buffer's function store_frame
-        obs_b, act_b, rew_b, next_obs_b, done_b = self.sample(self.batch_size)
-        self.replay_buffer_idx = self.replay_buffer.store_frame(obs_b)
+        self.replay_buffer_idx = self.replay_buffer.store_frame(self.last_obs)
 
         eps = self.exploration.value(self.t)
         # TODO use epsilon greedy exploration when selecting action
         # HINT: take random action 
             # with probability eps (see np.random.random())
             # OR if your current step number (see self.t) is less that self.learning_starts
-        perform_random_action = True np.random.random() < eps or self.t < self.learning_starts
+        perform_random_action = np.random.random() < eps or self.t < self.learning_starts
 
         if perform_random_action:
             action = np.random.randint(self.num_actions)
@@ -82,8 +81,7 @@ class DQNAgent(object):
         # HINT1: remember that self.last_obs must always point to the newest/latest observation
         # HINT2: remember the following useful function that you've seen before:
             #obs, reward, done, info = env.step(action)
-        self.last_obs = env.step(action)
-        _, reward, done, _ = self.last_obs
+        self.last_obs, reward, done, _ = self.env.step(action)
 
         # TODO store the result of taking this action into the replay buffer
         # HINT1: see replay buffer's store_effect function
@@ -91,7 +89,8 @@ class DQNAgent(object):
         self.replay_buffer.store_effect(self.replay_buffer_idx, action, reward, done)
 
         # TODO if taking this step resulted in done, reset the env (and the latest observation)
-        done
+        if done:
+            self.last_obs = self.env.reset()
 
     def sample(self, batch_size):
         if self.replay_buffer.can_sample(self.batch_size):
@@ -124,7 +123,7 @@ class DQNAgent(object):
 
             # TODO: create a LIST of tensors to run in order to 
             # train the critic as well as get the resulting total_error
-            tensors_to_run = [self.total_error, self.train_fn]
+            tensors_to_run = [self.critic.total_error, self.critic.train_fn]
             loss, _ = self.sess.run(tensors_to_run, feed_dict=feed_dict)
             # Note: remember that the critic's total_error value is what you
             # created to compute the Bellman error in a batch, 
@@ -134,7 +133,7 @@ class DQNAgent(object):
             # TODO: use sess.run to periodically update the critic's target function
             # HINT: see update_target_fn
             if self.num_param_updates % self.target_update_freq == 0:
-                self.sess.run(update_target_fn, feed_dict=feed_dict)
+                self.sess.run(self.critic.update_target_fn, feed_dict=feed_dict)
 
             self.num_param_updates += 1
 
