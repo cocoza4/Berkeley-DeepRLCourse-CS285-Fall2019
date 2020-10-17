@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/cocoza4/workspace/berkeleydeeprlcourse/berkeley_deeprlcourse_homework_fall2019/hw1/cs285/scripts/../data/dagger_test_dagger_ant_Ant-v2_17-10-2020_14-35-46/policy_itr_99"
+all_model_checkpoint_paths: "/home/cocoza4/workspace/berkeleydeeprlcourse/berkeley_deeprlcourse_homework_fall2019/hw1/cs285/scripts/../data/dagger_test_dagger_ant_Ant-v2_17-10-2020_14-35-46/policy_itr_99"

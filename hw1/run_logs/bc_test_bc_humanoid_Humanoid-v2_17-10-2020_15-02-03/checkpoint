@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/cocoza4/workspace/berkeleydeeprlcourse/berkeley_deeprlcourse_homework_fall2019/hw1/cs285/scripts/../data/bc_test_bc_humanoid_Humanoid-v2_17-10-2020_15-02-03/policy_itr_0"
+all_model_checkpoint_paths: "/home/cocoza4/workspace/berkeleydeeprlcourse/berkeley_deeprlcourse_homework_fall2019/hw1/cs285/scripts/../data/bc_test_bc_humanoid_Humanoid-v2_17-10-2020_15-02-03/policy_itr_0"
