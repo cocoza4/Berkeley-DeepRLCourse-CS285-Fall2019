@@ -55,7 +55,7 @@ class BootstrappedContinuousCritic(BaseCritic):
         self.critic_loss = tf.losses.mean_squared_error(self.sy_target_n, self.critic_prediction)
 
         # TODO: use the AdamOptimizer to optimize the loss defined above
-        adam = tf.compat.v1.train.AdamOptimizer()
+        adam = tf.train.AdamOptimizer()
         self.critic_update_op = adam.minimize(self.critic_loss)
 
     def define_placeholders(self):
