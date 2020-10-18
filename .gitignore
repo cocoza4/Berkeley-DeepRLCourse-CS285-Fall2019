@@ -1,4 +1,5 @@
 .idea/
+.ipynb_checkpoints/
 cs285.egg-info/
 __pycache__/
 data/
