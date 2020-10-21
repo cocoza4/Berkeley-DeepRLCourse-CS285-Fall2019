@@ -62,3 +62,23 @@ Note Type `ac_{target_update}_{gradient_updates}` means `gradient_updates` gradi
     xvfb-run -a python scripts/run_hw3_actor_critic.py --env_name CartPole-v0 -n 100 -b 1000 --exp_name 10_10 -ntu 10 -ngsptu 10
 
 ## Question 5
+#### ActorCritic - InvertedPendulum
+![InvertedPendulum](./run_logs/q5_invertedpendulum.png "InvertedPendulum")
+
+#### ActorCritic - HalfCheeta
+![HalfCheeta](./run_logs/q5_halfcheeta.png "HalfCheeta")
+
+Note Type `ac_{target_update}_{gradient_updates}` means `gradient_updates` gradient update steps per target update step, and `target_update` target update steps.
+
+<br>
+
+    xvfb-run -a python scripts/run_hw3_actor_critic.py --env_name InvertedPendulum-v2 --ep_len 1000 --discount 0.95 -n 100 -l 2 -s 64 -b 5000 -lr 0.01 --exp_name 10_10 -ntu 10 -ngsptu 10
+<br>
+
+    xvfb-run -a python scripts/run_hw3_actor_critic.py --env_name InvertedPendulum-v2 --ep_len 1000 --discount 0.95 -n 100 -l 2 -s 64 -b 5000 -lr 0.01 --exp_name 1_100 -ntu 1 -ngsptu 100
+<br>
+
+    xvfb-run -a python scripts/run_hw3_actor_critic.py --env_name HalfCheetah-v2 --ep_len 150 --discount 0.90 --scalar_log_freq 1 -n 150 -l 2 -s 32 -b 30000 -eb 1500 -lr 0.02 --exp_name 10_10 -ntu 10 -ngsptu 10
+<br>
+
+    xvfb-run -a python scripts/run_hw3_actor_critic.py --env_name HalfCheetah-v2 --ep_len 150 --discount 0.90 --scalar_log_freq 1 -n 150 -l 2 -s 32 -b 30000 -eb 1500 -lr 0.02 --exp_name 1_100 -ntu 1 -ngsptu 100
