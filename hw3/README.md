@@ -2,6 +2,11 @@
 
 ## Question 1
 
+#### DQN - Pong 
+![Pong](./run_logs/q1_pong.png "Pong")
+
+    xvfb-run -a python scripts/run_hw3_dqn.py --env_name PongNoFrameskip-v4 --exp_name q1_pong
+
 #### DQN - LunarLander 
 ![LunarLander](./run_logs/q1_lunarlander.png "LunarLander")
 
