@@ -47,8 +47,8 @@ class MBAgent(BaseAgent):
             
             # select which datapoints to use for this model of the ensemble
             # you might find the num_data_per_env variable defined above useful
-
-            observations = # TODO(Q1)
+            start = i*num_data_per_ens
+            observations = ob_no[start:start+num_data_per_ens]
             actions = # TODO(Q1)
             next_observations = # TODO(Q1)
 

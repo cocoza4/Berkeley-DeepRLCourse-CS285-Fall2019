@@ -49,15 +49,15 @@ class FFModel(BaseModel):
         obs_unnormalized = self.obs_pl
         acs_unnormalized = self.acs_pl
         # Hint: Consider using the normalize function defined in infrastructure.utils for the following two lines
-        obs_normalized = # TODO(Q1) Define obs_normalized using obs_unnormalized,and self.obs_mean_pl and self.obs_std_pl
-        acs_normalized = # TODO(Q2) Define acs_normalized using acs_unnormalized and self.acs_mean_pl and self.acs_std_pl
+        obs_normalized = normalize(obs_unnormalized, self.obs_mean_pl, self.obs_std_pl) # TODO(Q1) Define obs_normalized using obs_unnormalized,and self.obs_mean_pl and self.obs_std_pl
+        acs_normalized = normalize(acs_unnormalized, self.acs_mean_pl, self.acs_std_pl) # TODO(Q2) Define acs_normalized using acs_unnormalized and self.acs_mean_pl and self.acs_std_pl
 
         # predicted change in obs
         concatenated_input = tf.concat([obs_normalized, acs_normalized], axis=1)
         # Hint: Note that the prefix delta is used in the variable below to denote changes in state, i.e. (s'-s)
-        self.delta_pred_normalized = # TODO(Q1) Use the build_mlp function and the concatenated_input above to define a neural network that predicts unnormalized delta states (i.e. change in state)
-        self.delta_pred_unnormalized = # TODO(Q1) Unnormalize the the delta_pred above using the unnormalize function, and self.delta_mean_pl and self.delta_std_pl
-        self.next_obs_pred = # TODO(Q1) Predict next observation using current observation and delta prediction (not that next_obs here is unnormalized)
+        self.delta_pred_normalized = build_mlp(concatenated_input, output_size, self.scope, self.n_layers, self.size) # TODO(Q1) Use the build_mlp function and the concatenated_input above to define a neural network that predicts unnormalized delta states (i.e. change in state)
+        self.delta_pred_unnormalized = unnormalize(self.delta_pred_normalized, self.delta_mean_pl, self.delta_std_pl) # TODO(Q1) Unnormalize the the delta_pred above using the unnormalize function, and self.delta_mean_pl and self.delta_std_pl
+        self.next_obs_pred = self.get_prediction(obs_normalized, acs_normalized, # TODO(Q1) Predict next observation using current observation and delta prediction (not that next_obs here is unnormalized)
 
     def define_train_op(self):
 
@@ -71,7 +71,7 @@ class FFModel(BaseModel):
     #############################
 
     def get_prediction(self, obs, acs, data_statistics):
-        if len(obs.shape)>1:
+        if len(obs.shape) > 1:
             observations = obs
             actions = acs
         else:

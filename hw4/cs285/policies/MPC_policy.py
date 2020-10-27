@@ -34,7 +34,7 @@ class MPCPolicy(BasePolicy):
     def sample_action_sequences(self, num_sequences, horizon):
         # TODO(Q1) uniformly sample trajectories and return an array of
         # dimensions (num_sequences, horizon, self.ac_dim)
-        return random_action_sequences
+        return np.random.randint(self.low, self.high, size=(num_sequences, horizon, self.ac_dim))
 
     def get_action(self, obs):
 
