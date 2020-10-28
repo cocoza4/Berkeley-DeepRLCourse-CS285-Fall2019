@@ -4,6 +4,8 @@ from cs285.policies.MPC_policy import MPCPolicy
 from cs285.infrastructure.replay_buffer import ReplayBuffer
 from cs285.infrastructure.utils import *
 
+import numpy as np
+
 
 class MBAgent(BaseAgent):
     def __init__(self, sess, env, agent_params):
@@ -49,11 +51,11 @@ class MBAgent(BaseAgent):
             # you might find the num_data_per_env variable defined above useful
             start = i*num_data_per_ens
             observations = ob_no[start:start+num_data_per_ens]
-            actions = # TODO(Q1)
-            next_observations = # TODO(Q1)
+            actions = ac_na[start:start+num_data_per_ens] # TODO(Q1)
+            next_observations = next_ob_no[start:start+num_data_per_ens] # TODO(Q1)
 
             # use datapoints to update one of the dyn_models
-            model =  # TODO(Q1)
+            model =  self.dyn_models[i] # TODO(Q1)
             loss = model.update(observations, actions, next_observations, self.data_statistics)
             losses.append(loss)
 

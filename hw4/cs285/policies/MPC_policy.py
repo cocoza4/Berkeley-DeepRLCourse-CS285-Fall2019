@@ -49,21 +49,22 @@ class MPCPolicy(BasePolicy):
         predicted_rewards_per_ens = []
 
         for model in self.dyn_models:
-            pass
             # TODO(Q2)
-
             # for each candidate action sequence, predict a sequence of
             # states for each dynamics model in your ensemble
+            states = model.get_prediction(obs, candidate_action_sequences, self.self.data_statistics)
 
             # once you have a sequence of predicted states from each model in your
             # ensemble, calculate the reward for each sequence using self.env.get_reward (See files in envs to see how to call this)
+            rewards = self.env.get_reward(states, candidate_action_sequences)
+            predicted_rewards_per_ens.append(rewards)
 
         # calculate mean_across_ensembles(predicted rewards).
         # the matrix dimensions should change as follows: [ens,N] --> N
-        predicted_rewards = None # TODO(Q2)
+        predicted_rewards = np.mean(predicted_rewards_per_ens) # TODO(Q2)
 
         # pick the action sequence and return the 1st element of that sequence
-        best_index = None #TODO(Q2)
-        best_action_sequence = None #TODO(Q2)
-        action_to_take = None # TODO(Q2)
+        best_index = np.argmax(predicted_rewards) #TODO(Q2)
+        best_action_sequence = candidate_action_sequences[best_index] #TODO(Q2)
+        action_to_take = best_action_sequence # TODO(Q2)
         return action_to_take[None] # the None is for matching expected dimensions

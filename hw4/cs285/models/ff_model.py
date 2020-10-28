@@ -55,18 +55,17 @@ class FFModel(BaseModel):
         # predicted change in obs
         concatenated_input = tf.concat([obs_normalized, acs_normalized], axis=1)
         # Hint: Note that the prefix delta is used in the variable below to denote changes in state, i.e. (s'-s)
-        self.delta_pred_normalized = build_mlp(concatenated_input, output_size, self.scope, self.n_layers, self.size) # TODO(Q1) Use the build_mlp function and the concatenated_input above to define a neural network that predicts unnormalized delta states (i.e. change in state)
+        self.delta_pred_normalized = build_mlp(concatenated_input, 1, self.scope, self.n_layers, self.size) # TODO(Q1) Use the build_mlp function and the concatenated_input above to define a neural network that predicts unnormalized delta states (i.e. change in state)
         self.delta_pred_unnormalized = unnormalize(self.delta_pred_normalized, self.delta_mean_pl, self.delta_std_pl) # TODO(Q1) Unnormalize the the delta_pred above using the unnormalize function, and self.delta_mean_pl and self.delta_std_pl
-        self.next_obs_pred = self.get_prediction(obs_normalized, acs_normalized, # TODO(Q1) Predict next observation using current observation and delta prediction (not that next_obs here is unnormalized)
+        self.next_obs_pred = obs_unnormalized + self.delta_pred_unnormalized # TODO(Q1) Predict next observation using current observation and delta prediction (not that next_obs here is unnormalized)
 
     def define_train_op(self):
-
         # normalize the labels
-        self.delta_labels_normalized =  # TODO(Q1) Define a normalized version of delta_labels using self.delta_labels (which are unnormalized), and self.delta_mean_pl and self.delta_std_pl
+        self.delta_labels_normalized = normalize(self.delta_labels, self.delta_mean_pl, self.delta_std_pl) # TODO(Q1) Define a normalized version of delta_labels using self.delta_labels (which are unnormalized), and self.delta_mean_pl and self.delta_std_pl
 
         # compared predicted deltas to labels (both should be normalized)
-        self.loss = # TODO(Q1) Define a loss function that takes as input normalized versions of predicted change in state and ground truth change in state
-        self.train_op = # TODO(Q1) Define a train_op to minimize the loss defined above. Adam optimizer will work well.
+        self.loss = tf.reduce_sum((self.delta_labels_normalized - self.delta_pred_normalized) ** 2) # TODO(Q1) Define a loss function that takes as input normalized versions of predicted change in state and ground truth change in state
+        self.train_op = tf.train.AdamOptimizer().minimize(self.loss) # TODO(Q1) Define a train_op to minimize the loss defined above. Adam optimizer will work well.
 
     #############################
 
@@ -77,9 +76,29 @@ class FFModel(BaseModel):
         else:
             observations = obs[None]
             actions = acs [None]
-        return # TODO(Q1) Run model prediction on the given batch of data
+        return self.sess.run(self.next_obs_pred, 
+                            feed_dict={
+                                self.obs_pl: observations, 
+                                self.acs_pl: actions,
+                                self.obs_mean_pl: data_statistics['obs_mean'],
+                                self.obs_std_pl: data_statistics['obs_std'],
+                                self.acs_mean_pl: data_statistics['acs_mean'],
+                                self.acs_std_pl: data_statistics['acs_std'],
+                                self.delta_mean_pl: data_statistics['delta_mean'],
+                                self.delta_std_pl: data_statistics['delta_std']
+                            }) # TODO(Q1) Run model prediction on the given batch of data
 
     def update(self, observations, actions, next_observations, data_statistics):
         # train the model
-        _, loss = # TODO(Q1) Run the defined train_op here, and also return the loss being optimized (on this batch of data)
+        _, loss = self.sess.run([self.train_op, self.loss], 
+                                feed_dict={
+                                    self.obs_pl: observations,
+                                    self.acs_pl: actions,
+                                    self.obs_mean_pl: data_statistics['obs_mean'],
+                                    self.obs_std_pl: data_statistics['obs_std'],
+                                    self.acs_mean_pl: data_statistics['acs_mean'],
+                                    self.acs_std_pl: data_statistics['acs_std'],
+                                    self.delta_mean_pl: data_statistics['delta_mean'],
+                                    self.delta_std_pl: data_statistics['delta_std']
+                                }) # TODO(Q1) Run the defined train_op here, and also return the loss being optimized (on this batch of data)
         return loss
