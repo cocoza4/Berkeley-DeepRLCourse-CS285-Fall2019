@@ -75,7 +75,7 @@ class FFModel(BaseModel):
             actions = acs
         else:
             observations = obs[None]
-            actions = acs [None]
+            actions = acs[None]
         return self.sess.run(self.next_obs_pred, 
                             feed_dict={
                                 self.obs_pl: observations, 
@@ -94,6 +94,7 @@ class FFModel(BaseModel):
                                 feed_dict={
                                     self.obs_pl: observations,
                                     self.acs_pl: actions,
+                                    self.delta_labels: next_observations - observations,
                                     self.obs_mean_pl: data_statistics['obs_mean'],
                                     self.obs_std_pl: data_statistics['obs_std'],
                                     self.acs_mean_pl: data_statistics['acs_mean'],
