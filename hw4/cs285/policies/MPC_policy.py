@@ -34,7 +34,7 @@ class MPCPolicy(BasePolicy):
     def sample_action_sequences(self, num_sequences, horizon):
         # TODO(Q1) uniformly sample trajectories and return an array of
         # dimensions (num_sequences, horizon, self.ac_dim)
-        return np.random.randint(self.low, self.high, size=(num_sequences, horizon, self.ac_dim))
+        return np.random.uniform(low=self.low, high=self.high, size=[num_sequences, horizon, self.ac_dim])
 
     def get_action(self, obs):
 
@@ -47,24 +47,31 @@ class MPCPolicy(BasePolicy):
 
         # a list you can use for storing the predicted reward for each candidate sequence
         predicted_rewards_per_ens = []
-
+        
         for model in self.dyn_models:
             # TODO(Q2)
             # for each candidate action sequence, predict a sequence of
             # states for each dynamics model in your ensemble
-            states = model.get_prediction(obs, candidate_action_sequences, self.self.data_statistics)
+            total_reward = np.zeros(self.N)
+            obs_batch = np.tile(obs, [self.N, 1])
 
             # once you have a sequence of predicted states from each model in your
             # ensemble, calculate the reward for each sequence using self.env.get_reward (See files in envs to see how to call this)
-            rewards = self.env.get_reward(states, candidate_action_sequences)
-            predicted_rewards_per_ens.append(rewards)
+            for t in range(self.horizon):
+                actions_batch = candidate_action_sequences[:, t]
+                rewards_batch, done = self.env.get_reward(obs_batch, actions_batch)
+                obs_batch = model.get_prediction(obs_batch, actions_batch, self.data_statistics)
+                total_reward += rewards_batch
+
+            predicted_rewards_per_ens.append(total_reward)
 
         # calculate mean_across_ensembles(predicted rewards).
         # the matrix dimensions should change as follows: [ens,N] --> N
-        predicted_rewards = np.mean(predicted_rewards_per_ens) # TODO(Q2)
+        predicted_rewards = np.mean(predicted_rewards_per_ens, axis=0) # TODO(Q2)
+        assert predicted_rewards.shape == (self.N,)
 
         # pick the action sequence and return the 1st element of that sequence
         best_index = np.argmax(predicted_rewards) #TODO(Q2)
         best_action_sequence = candidate_action_sequences[best_index] #TODO(Q2)
-        action_to_take = best_action_sequence # TODO(Q2)
+        action_to_take = best_action_sequence[0] # TODO(Q2)
         return action_to_take[None] # the None is for matching expected dimensions

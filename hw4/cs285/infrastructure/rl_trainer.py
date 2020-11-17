@@ -203,6 +203,7 @@ class RL_Trainer(object):
 
     def train_agent(self):
         print('\nTraining agent using sampled data from replay buffer...')
+        losses = []
         for train_step in range(self.params['num_agent_train_steps_per_iter']):
 
             # TODO sample some data from the data buffer
@@ -214,7 +215,9 @@ class RL_Trainer(object):
             # HINT: use the agent's train function
             # HINT: print or plot the loss for debugging!
             loss = self.agent.train(ob_batch, ac_batch, re_batch, next_ob_batch, terminal_batch)
-        return loss
+            losses.append(loss)
+
+        return losses
 
     def do_relabel_with_expert(self, expert_policy, paths):
         for path in paths:
@@ -258,7 +261,6 @@ class RL_Trainer(object):
         self.logger.flush()
 
     def perform_logging(self, itr, paths, eval_policy, train_video_paths, all_losses):
-
         loss = all_losses[-1]
 
         # collect eval trajectories, for logging
@@ -343,7 +345,7 @@ class RL_Trainer(object):
         # plot the predictions
         self.fig.clf()
         for i in range(ob_dim):
-            plt.subplot(ob_dim/2, 2, i+1)
+            plt.subplot(ob_dim//2, 2, i+1)
             plt.plot(true_states[:,i], 'g')
             plt.plot(pred_states[:,i], 'r')
         self.fig.suptitle('MPE: ' + str(mpe))

@@ -23,7 +23,7 @@ def calculate_mean_prediction_error(env, action_sequence, models, data_statistic
     pred_states = np.squeeze(pred_states)
 
     # Calculate the mean prediction error here
-    mpe = np.mean(true_states - pred_states) # TODO(Q1)
+    mpe = mean_squared_error(true_states, pred_states) # TODO(Q1)
 
     return mpe, true_states, pred_states
 
@@ -91,7 +91,7 @@ def sample_trajectory(env, policy, max_path_length, render=False, render_mode=('
 
         # TODO end the rollout if the rollout ended 
         # HINT: rollout can end due to done, or due to max_path_length
-        rollout_done = 1 if done or steps == max_path_length else 0 # HINT: this is either 0 or 1
+        rollout_done = 1 if done or steps >= max_path_length else 0 # HINT: this is either 0 or 1
         terminals.append(rollout_done)
         
         if rollout_done: 
